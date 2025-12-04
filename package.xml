@@ -4,7 +4,7 @@
   <name>mypkg</name>
   <version>0.0.0</version>
   <description>ロボットシステム工学課題</description>
-  <maintainer email="s00C0000@s.chibakoudai.jp">Yuki Akutsu</maintainer>
+  <maintainer email="s00C0000@s.chibakoudai.jp">Yuki468788</maintainer>
   <license>BSD-3-Clause</license>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
