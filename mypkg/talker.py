@@ -1,21 +1,23 @@
 import rclpy
 from rclpy.node import Node
-from peron_msgs.msg import Query
+from person_msgs.msg import Int16
 
-rclpy.init()
-node = Node("talker")
-pub = node.create_publisher(Person, "person", 10)
-n = 0
+class Talker():
+    def __init__(self,nh):
+        self.pub = node.create_publisher(Int16 , "countup" , 10)
+        self.n = 0
+        nh.create_timer(0.5 , cb)
+    def cb(self):
+        msg = Int16()
+        msg.data = self.n
+        self.pub.publish(msg)
+        self.n += 1    
 
-
-def cb(request, response):
-    if request.name == "あげたこ":
-        response.age = 20
-    else:
-        response.age = 255
-
-    return response
-def main():
-    srv = node.create_service(Query, "query", cb)
+def main(): 
+    rclpy.init()
+    node = Node("talker")
+    talker = Talker()
     rclpy.spin(node)
 
+if __name__ == '__main__':
+    main()
