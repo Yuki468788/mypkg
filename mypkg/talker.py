@@ -1,21 +1,55 @@
+#!/usr/bin/python
+# SPDX-FileCopyrightText: 2025 Yuki Akutsu
+# SPDX-License-Identifier: BSD-3-Clause
 import rclpy
 from rclpy.node import Node
-from peron_msgs.msg import Query
+from std_msgs.msg import Int16 , String
 
-rclpy.init()
-node = Node("talker")
-pub = node.create_publisher(Person, "person", 10)
-n = 0
+class Timer(Node):
+    def __init__(self):
+        super().__init__('timer')
 
+        self.declare_parameter('work' , 25)
+        self.declare_parameter('break' , 5)
 
-def cb(request, response):
-    if request.name == "あげたこ":
-        response.age = 20
-    else:
-        response.age = 255
+        self.work_min = self.get_parameter('work').value
+        self.break_min = self.get_parameter('break').value
 
-    return response
+        self.pub_state = self.create_publisher(String, 'timer_state' , 10)
+        self.pub_time = self.create_publisher(Int16, 'remaining_seconds' , 10)
+
+        self.state = "WORK"
+        self.remaining_sec = self.work_min * 60
+
+        self.create_timer(1.0, self.callback)
+        self.get_logger().info(f"start")
+
+    def callback(self):
+
+        self.remaining_sec -= 1
+
+        if self.remaining_sec < 0:
+            if self.state == "WORK":
+                self.state = "BREAK"
+                self.remaining_sec = seif.break_min * 60
+                self.get_logger().info("Break")
+            else:
+                self.state = "WORK"
+                self.remaining_sec = self.work_min * 60
+                self.get_logger().info("Restart")
+
+        msg_time = Int16()
+        msg_time.data = self.remaining_sec
+        self.pub_time.publish(msg_time)
+
 def main():
-    srv = node.create_service(Query, "query", cb)
-    rclpy.spin(node)
+    rclpy.init()
+    node = Timer()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    rclpy.shutdown()
 
+if __name__ == '__main__':
+    main()
