@@ -13,9 +13,11 @@ if [ -f $dir/.bashrc ]; then
 else
     source /opt/ros/humble/setup.bash
 fi
-
 source install/setup.bash
+ros2 run mypkg talker --ros-args -p work:=0.1 &
+TALKER_PID=$!
+sleep 2
+timeout 15 ros2 run mypkg listener > /tmp/mypkg.log 2>&1
 
-timeout 10 ros2 run mypkg talker --ros-args -p work:=0.1 > /tmp/mypkg.log
-
+kill $TALKER_PID
 cat /tmp/mypkg.log | grep 'Break'

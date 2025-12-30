@@ -9,8 +9,8 @@ class Timer(Node):
     def __init__(self):
         super().__init__('timer')
 
-        self.declare_parameter('work' , 25)
-        self.declare_parameter('break' , 5)
+        self.declare_parameter('work' , 25.0)
+        self.declare_parameter('break' , 5.0)
 
         self.work_min = self.get_parameter('work').value
         self.break_min = self.get_parameter('break').value
@@ -19,7 +19,7 @@ class Timer(Node):
         self.pub_time = self.create_publisher(Int16, 'remaining_seconds' , 10)
 
         self.state = "WORK"
-        self.remaining_sec = self.work_min * 60
+        self.remaining_sec = int(self.work_min * 60)
 
         self.create_timer(1.0, self.callback)
         self.get_logger().info(f"start")
@@ -31,11 +31,11 @@ class Timer(Node):
         if self.remaining_sec < 0:
             if self.state == "WORK":
                 self.state = "BREAK"
-                self.remaining_sec = seif.break_min * 60
+                self.remaining_sec = int(self.break_min * 60)
                 self.get_logger().info("Break")
             else:
                 self.state = "WORK"
-                self.remaining_sec = self.work_min * 60
+                self.remaining_sec = int(self.work_min * 60)
                 self.get_logger().info("Restart")
 
         msg_time = Int16()
