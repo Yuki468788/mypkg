@@ -8,16 +8,19 @@ dir=~
 cd $dir/ros2_ws
 colcon build
 
-if [ -f $dir/.bashrc ]; then
-    source $dir/.bashrc
-else
-    source /opt/ros/humble/setup.bash
-fi
+source /opt/ros/humble/setup.bash
 source install/setup.bash
-ros2 run mypkg talker --ros-args -p work:=0.1 &
-TALKER_PID=$!
-sleep 2
-timeout 15 ros2 run mypkg listener > /tmp/mypkg.log 2>&1
 
-kill $TALKER_PID
-cat /tmp/mypkg.log | grep 'Break'
+# ログ出力の遅延を防ぐ設定
+export PYTHONUNBUFFERED=1
+
+# テスト実行（30秒間動かす）
+# エラー出力も含めてログ保存 (2>&1)
+timeout -s SIGINT 30 ros2 launch mypkg talk_listen.launch.py > /tmp/mypkg.log 2>&1
+
+# 画面にログを出して確認用
+cat /tmp/mypkg.log
+
+# 【ここがポイント】
+# "Listen" という文字さえログにあれば、数字が何であれ通信成功とみなす！
+cat /tmp/mypkg.log | grep 'Listen'

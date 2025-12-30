@@ -22,7 +22,6 @@ class Listener(Node):
         mins = seconds // 60
         secs = seconds % 60
         self.get_logger().info(f"[{self.current_state}] | Remaining:{mins:02d}:{secs:02d}")
-
 def main():
     rclpy.init()
     node = Listener()
