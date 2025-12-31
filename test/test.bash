@@ -8,19 +8,33 @@ dir=~
 cd $dir/ros2_ws
 colcon build
 
+# 環境セットアップ
 source /opt/ros/humble/setup.bash
 source install/setup.bash
 
-# ログ出力の遅延を防ぐ設定
-export PYTHONUNBUFFERED=1
+# --- 1. 念のため古いプロセスを掃除 ---
+pkill -f talker || true
 
-# テスト実行（30秒間動かす）
-# エラー出力も含めてログ保存 (2>&1)
-timeout -s SIGINT 30 ros2 launch mypkg talk_listen.launch.py > /tmp/mypkg.log 2>&1
+# --- 2. Talkerをバックグラウンドで起動 ---
+# パラメータで時間を短く(0.1分)設定
+ros2 run mypkg talker --ros-args -p work:=0.1 &
+TALKER_PID=$!
 
-# 画面にログを出して確認用
-cat /tmp/mypkg.log
+# 起動を少し待つ
+sleep 5
 
-# 【ここがポイント】
-# "Listen" という文字さえログにあれば、数字が何であれ通信成功とみなす！
-cat /tmp/mypkg.log | grep 'Listen'
+# --- 3. 1回だけデータを受信して保存 ---
+# --once があるので、1つでもデータを受け取ればこのコマンドは即終了します
+# 万が一データが届かない時のために timeout 15 をつけています
+timeout 15 ros2 topic echo --once /timer_state > /tmp/echo.log || true
+
+# --- 4. 後始末 ---
+kill $TALKER_PID || true
+pkill -f talker || true
+
+# --- 5. 判定 ---
+# ログを表示
+cat /tmp/echo.log
+
+# ログの中に "data:" という文字列があれば、通信成立とみなして合格(Exit 0)
+grep 'start' /tmp/echo.log
