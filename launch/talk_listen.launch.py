@@ -14,6 +14,10 @@ def generate_launch_description():
                 executable = 'listener',
                 output = 'screen',
                 )
-
-    return launch.LaunchDescription([talker , listener])
+    gui = launch_ros.actions.Node(
+                package = 'mypkg',
+                executable = 'gui',
+                output = 'screen',
+                )
+    return launch.LaunchDescription([talker , listener , gui])
 
