@@ -26,7 +26,7 @@ $ ros2 launch mypkg talk_listen.launch.py
 - talkerが取得している時間をquiで受信し、デスクトップ上で可視化する
 ## テスト環境
 - Ubuntu 22.04.5 LTS
-- ROS2 Humble
+- ROS2 Humble Hawksbill
 - Python 3.10
 ## 謝辞
 - 参考にした資料・サイト
