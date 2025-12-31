@@ -26,7 +26,7 @@ $ ros2 launch mypkg talk_listen.launch.py
   - サブスクライブするトピック：'timer_state'、'remaining_seconds'
 ### gui
 - talkerが取得している時間をquiで受信し、デスクトップ上で可視化する
-　- サブスクライブするトピック：'timer_state'、'remaining_seconds'
+	- サブスクライブするトピック：'timer_state'、'remaining_seconds'
 ## トピック説明
 ### timer_state
 - timerがWORKかBREAKかを配信
