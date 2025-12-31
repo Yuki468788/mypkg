@@ -20,10 +20,18 @@ $ ros2 launch mypkg talk_listen.launch.py
 ## ノード説明
 ### talker
 - WORKとBREAKのステータスを管理し、そのステータスにあったタイマーの情報を配信する
+  - パブリッシュするトピック：'timer_state'、'remaining_seconds'
 ### listener
 - talkerが取得している残り時間をlistenerで受信し、ターミナルで表示する
+  - サブスクライブするトピック：'timer_state'、'remaining_seconds'
 ### gui
 - talkerが取得している時間をquiで受信し、デスクトップ上で可視化する
+　- サブスクライブするトピック：'timer_state'、'remaining_seconds'
+## トピック説明
+### timer_state
+- timerがWORKかBREAKかを配信
+### remaining_seconds
+- 残り時間が何分何秒かを配信
 ## テスト環境
 - Ubuntu 22.04.5 LTS
 - ROS2 Humble Hawksbill
