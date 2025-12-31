@@ -37,4 +37,4 @@ pkill -f talker || true
 cat /tmp/echo.log
 
 # ログの中に "data:" という文字列があれば、通信成立とみなして合格(Exit 0)
-grep 'start' /tmp/echo.log
+grep 'data:' /tmp/echo.log
