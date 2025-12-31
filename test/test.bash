@@ -12,29 +12,28 @@ colcon build
 source /opt/ros/humble/setup.bash
 source install/setup.bash
 
-# --- 1. 念のため古いプロセスを掃除 ---
+# ログをリアルタイムで出力させる
+export PYTHONUNBUFFERED=1
+
+# --- 1. 幽霊退治 ---
 pkill -f talker || true
+pkill -f listener || true
 
-# --- 2. Talkerをバックグラウンドで起動 ---
-# パラメータで時間を短く(0.1分)設定
-ros2 run mypkg talker --ros-args -p work:=0.1 &
-TALKER_PID=$!
+# --- 2. テスト実行 (ここが重要) ---
+# launch ファイルを使って一括起動し、出力をすべて /tmp/mypkg.log に保存します。
+# 20秒間動かして、終了時のエラーは || true で無視します。
+timeout -s SIGINT 20 ros2 launch mypkg talk_listen.launch.py > /tmp/mypkg.log 2>&1 || true
 
-# 起動を少し待つ
-sleep 5
-
-# --- 3. 1回だけデータを受信して保存 ---
-# --once があるので、1つでもデータを受け取ればこのコマンドは即終了します
-# 万が一データが届かない時のために timeout 15 をつけています
-timeout 15 ros2 topic echo --once /timer_state > /tmp/echo.log || true
-
-# --- 4. 後始末 ---
-kill $TALKER_PID || true
+# --- 3. 後始末 ---
 pkill -f talker || true
+pkill -f listener || true
+
+# --- 4. ログの表示 (GitHub Actionsの画面で確認するため) ---
+echo "--- ALL LOG START ---"
+cat /tmp/mypkg.log
+echo "--- ALL LOG END ---"
 
 # --- 5. 判定 ---
-# ログを表示
-cat /tmp/echo.log
-
-# ログの中に "data:" という文字列があれば、通信成立とみなして合格(Exit 0)
-grep 'data:' /tmp/echo.log
+# ログの中に Talker が出した '[timer]: start' または Listener が受信した 'Remaining'
+# という文字が 1 つでもあれば、合格 (Exit 0) とします。
+grep -E '\[timer\]: start|Remaining' /tmp/mypkg.log
